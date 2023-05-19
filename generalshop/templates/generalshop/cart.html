@@ -1,0 +1,232 @@
+{% load static %}
+<style>
+  img {
+    height: 100px;
+    width: 100px;
+  }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>NAME</th>
+      <th>PRICE</th>
+      <th>QUANTITY</th>
+      <th>TOTAL</th>
+      <th></th>
+    </tr>
+  </thead>
+  {%for item in items %}
+ <tbody>
+ <tr>
+ <td><img src="{{ item.product.home_image.url }}" alt="{{ item.product.product_name }}" width="50" height="50"></td>
+ <td>{{ item.product.product_name }}</td>
+ <td>{{ item.product.selling_price }}</td>
+ <td data-product-id="{{item.product.id}}">
+ <button data-action="add">+</button> {{ item.quantity }}
+ <button data-action="subtract"  disabled>-</button>
+ <button id="delete_item_button" data-action="delete" >x</button>
+ </td>
+ <td id="total-{{item.product.id}}">ksh {{item.get_total}}</td>
+ </tr>
+ </tbody>
+{% endfor %}
+
+    <td><h3>TOTAL DUE</h3></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <h4></h4>
+      <td id="order-total">Ksh {{ order.get_order_total }}</td>
+      <td></td>
+  </tfoot>
+  
+</table>
+
+<script>
+// Select all subtract buttons
+var subtractButtons = document.querySelectorAll('[data-action="subtract"]');
+
+// Add event listener to each subtract button
+subtractButtons.forEach(function(subtractButton) {
+ subtractButton.addEventListener('click', function() {
+ // Get the product id and action from the data attributes
+ var productId = this.parentNode.dataset.productId;
+ var action = this.dataset.action;
+ console.log('productId:', productId, 'action:', action);
+ // Call the subtractQuantity function with the product id and action
+ subtractQuantity(productId, action);
+ });
+});
+
+function subtractQuantity(productId, action) {
+ var url = '/decreasequantity/';
+ fetch(url, {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json',
+ 'X-CSRFToken': csrftoken
+ },
+ body: JSON.stringify({ 'productId': productId, 'action': action })
+ })
+ .then(function(response) {
+ return response.json();
+ })
+ .then(function(data) {
+ console.log('data:', data);
+ // Check if the operation was successful
+ if (data.success) {
+ // Find the quantity element using the data-product-id attribute
+ var quantityElement = document.querySelector('[data-product-id="' + productId + '"]');
+ // Update the quantity element with the new value
+ quantityElement.querySelector('button').nextSibling.textContent = ' ' + data.quantity + ' ';
+ // Find the total element using the data-product-id attribute
+ var totalElement = document.querySelector('#total-' + productId);
+ // Update the total element with the new value
+ totalElement.textContent = 'ksh ' + data.total;
+ // Update the order total element with the new value
+ var orderTotalElement = document.querySelector('#order-total');
+ orderTotalElement.textContent = 'Ksh ' + data.order_total;
+ 
+ // Check if the quantity is 1 and disable the subtract button if so
+ if (data.quantity == 1) {
+   // Find the subtract button using the data-product-id attribute
+   var subtractButton = document.querySelector('[data-product-id="' + productId + '"] [data-action="subtract"]');
+   // Disable the subtract button
+   subtractButton.disabled = true;
+ }
+ 
+ } else {
+ // Handle any errors or messages
+ alert(data.message);
+ }
+ });
+}
+
+var actionButtons = document.querySelectorAll('[data-action="add"]');
+
+// Loop through each button and add an event listener
+for (var i = 0; i < actionButtons.length; i++) {
+ actionButtons[i].addEventListener('click', function() {
+ // Get the product id and action from the data attributes
+ var productId = this.parentNode.dataset.productId;
+ var action = this.dataset.action;
+ console.log('productId:', productId, 'action:', action);
+ // Call the addQuantity function with the product id and action
+ addQuantity(productId, action);
+ });
+}
+
+// Define a function that sends an AJAX request to your Django view to increase the quantity
+function addQuantity(productId, action) {
+ var url = '/increasequantity/'
+ fetch(url, {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json',
+ 'X-CSRFToken': csrftoken
+ },
+ body: JSON.stringify({'productId': productId, 'action': action})
+ })
+ .then((response) => {
+ return response.json()
+ })
+ .then((data) => {
+ console.log('data:',data)
+ // Check if the operation was successful
+ if (data.success) {
+ // Find the quantity element using the data-product-id attribute
+ var quantityElement = document.querySelector('[data-product-id="' + productId + '"]');
+ // Update the quantity element with the new value
+ quantityElement.querySelector('button').nextSibling.textContent = ' ' + data.quantity + ' ';
+ // Find the total element using the data-product-id attribute
+ var totalElement = document.querySelector('#total-' + productId);
+ // Update the total element with the new value
+ totalElement.textContent = 'ksh ' + data.total;
+ // Update the order total element with the new value
+ var orderTotalElement = document.querySelector('#order-total');
+ orderTotalElement.textContent = 'Ksh ' + data.order_total;
+
+ // Check if the quantity is more than 1 and enable the subtract button if so
+ if (data.quantity > 1) {
+   // Find the subtract button using the data-product-id attribute
+   var subtractButton = document.querySelector('[data-product-id="' + productId + '"] [data-action="subtract"]');
+   // Enable the subtract button
+   subtractButton.disabled = false;
+ }
+ 
+ } else {
+ // Handle any errors or messages
+ alert(data.message);
+ }
+ })
+}
+
+
+// Get all the delete buttons using the data-action attribute
+var deleteButtons = document.querySelectorAll('[data-action="delete"]');
+// Loop through each button and add a click event listener
+for (var i = 0; i < deleteButtons.length; i++) {
+ deleteButtons[i].addEventListener('click', function() {
+ // Get the product id from the parent element's data-product-id attribute
+ var productId = this.parentNode.dataset.productId;
+ // Call the deleteCartItem function with the product id
+ deleteCartItem(productId);
+ });
+}
+
+function deleteCartItem(productId) {
+  var url = '/deletecartitem/'
+ fetch(url, {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json',
+ 'X-CSRFToken': csrftoken
+ },
+ body: JSON.stringify({'productId': productId})
+ })
+ .then((response) => {
+ return response.json()
+ })
+ .then((data) => {
+ console.log('data:',data)
+ // Check if the operation was successful
+ if (data.success) {
+ // Find the table row element using the data-product-id attribute
+ var rowElement = document.querySelector('[data-product-id="' + productId + '"]').parentNode;
+ // Remove the row element from the table
+ rowElement.remove();
+ // Update the order total element with the new value
+ var orderTotalElement = document.querySelector('#order-total');
+ orderTotalElement.textContent = 'Ksh ' + data.order_total;
+ } else {
+ // Handle any errors or messages
+ alert(data.message);
+ }
+ })
+}
+
+
+
+function getToken(name) {
+ let cookieValue = null;
+ if (document.cookie && document.cookie !== '') {
+ const cookies = document.cookie.split(';');
+ for (let i = 0; i < cookies.length; i++) {
+ const cookie = cookies[i].trim();
+ // Does this cookie string begin with the name we want?
+ if (cookie.substring(0, name.length + 1) === (name + '=')) {
+ cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+ break;
+ }
+ }
+ }
+ return cookieValue;
+}
+const csrftoken = getToken('csrftoken');
+
+</script>
+

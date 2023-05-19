@@ -1,0 +1,92 @@
+<!-- HTML form for submitting product data -->
+
+<style>
+  img {
+   width: 150px;
+   height:150px;
+  }
+ </style>
+ 
+<form method="post" enctype="multipart/form-data">
+  <!-- Cross-site request forgery token -->
+  {% csrf_token %}
+  
+  <!-- Product name input -->
+  <label for="product_name">Product Name:</label><br>
+  <input type="text" id="product_name" name="product_name" required><br>
+  
+  <!-- Product description input -->
+  <label for="description">Description:</label><br>
+  <input type="text" id="description" name="description" required><br>
+  
+  <!-- Home image input with preview -->
+  <label for="home_image">Home Image:</label><br>
+  <input type="file" id="home_image" name="home_image" accept="image/*" required><br>
+  <div id="home_image_preview"></div>
+
+  <label for="more_images">More Images:</label><br>
+  <input type="file" id="more_images" name="more_images" accept="image/*" multiple><br>
+  <div id="more_images_preview"></div>
+  <!-- Buying price input -->
+  <label for="buying_price">Buying Price:</label><br>
+  <input type="number" id="buying_price" name="buying_price" min="0" step="0.01" required><br>
+  
+  <!-- Selling price input -->
+  <label for="selling_price">Selling Price:</label><br>
+  <input type="number" id="selling_price" name="selling_price" min="0" step="0.01" required><br>
+  
+  <!-- Unit amount input -->
+  <label for="unit_amount">Unit Amount:</label><br>
+  <input type="number" id="unit_amount" name="unit_amount" min="1" required><br>
+  
+  <!-- Unit type input -->
+  <label for="unit_type">Unit Type:</label><br>
+  <input type="text" id="unit_type" name="unit_type" required><br>
+  
+  <!-- Submit button -->
+  <input type="submit" value="Submit">
+</form>
+
+<!-- JavaScript for previewing images -->
+<script>
+
+  // Get references to the file input elements
+const moreImagesInput = document.getElementById("more_images");
+const homeImageInput = document.getElementById("home_image");
+
+// Add event listeners to the input elements
+moreImagesInput.addEventListener("change", previewImages);
+homeImageInput.addEventListener("change", previewImage);
+
+// Define the preview functions
+function previewImages() {
+  const previewContainer = document.getElementById("more_images_preview");
+  previewContainer.innerHTML = "";
+  const files = moreImagesInput.files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = function() {
+      const image = new Image();
+      image.src = reader.result;
+      previewContainer.appendChild(image);
+    }
+    reader.readAsDataURL(file);
+  }
+}
+
+function previewImage() {
+  const previewContainer = document.getElementById("home_image_preview");
+  previewContainer.innerHTML = "";
+  const file = homeImageInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function() {
+    const image = new Image();
+    image.src = reader.result;
+    previewContainer.appendChild(image);
+  }
+  reader.readAsDataURL(file);
+}
+</script>
+
+

@@ -1,0 +1,88 @@
+{% load static %}
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="{% static 'styles/petty_costs.css' %}">
+
+<div class="form-container">
+  <form method="POST">
+    {% csrf_token %}
+    <label for="activity">Activity:</label>
+    <input type="text" name="activity" required><br><br>
+
+    <label for="transport_cost">Transport cost:</label>
+    <input type="number" step="0.01" name="transport_cost" required><br><br>
+
+    <label for="lunch_cost">Lunch cost:</label>
+    <input type="number" step="0.01" name="lunch_cost" required><br><br>
+
+    <label for="airtime_cost">Airtime cost:</label>
+    <input type="number" step="0.01" name="airtime_cost" required><br><br>
+
+    <label for="others">Others:</label>
+    <input type="text" name="others"><br><br>
+
+    <label for="expense">Expense:</label>
+    <input type="number" step="0.01" name="expense" required><br><br>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <div class="guidance_list">
+    <ul>
+      <li>Please make sure to complete all necessary fields on the form.</li>
+      <li>To view a summary of your costs and their totals, scroll down the page.</li>
+      <li>If you have any concerns about a particular cost, please send a WhatsApp message to 0741 202104 with details of the issue.</li>
+    </ul>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Activity</th>
+      <th>Transport Cost</th>
+      <th>Lunch Cost</th>
+      <th>Airtime Cost</th>
+      <th>Others</th>
+      <th>Expense</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for petty_costs in petty_costs_list %}
+    <tr>
+      <td>{{ petty_costs.date_created }}</td>
+      <td>{{ petty_costs.activity }}</td>
+      <td>{{ petty_costs.transport_cost }}</td>
+      <td>{{ petty_costs.lunch_cost }}</td>
+      <td>{{ petty_costs.airtime_cost }}</td>
+      <td></td>
+      <td></td>
+    </tr>
+    {% for other_petty_costs in other_petty_costs_list %}
+    {% if other_petty_costs.pettycosts == petty_costs %}
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>{{ other_petty_costs.others }}</td>
+      <td>{{ other_petty_costs.expense }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">Totals:</td>
+      <td>{{ transport_cost_total }}</td>
+      <td>{{ lunch_cost_total }}</td>
+      <td>{{ airtime_cost_total }}</td>
+      <td>{{ others_total }}</td>
+      <td>{{ expense_total }}</td>
+    </tr>
+  </tfoot>
+</table>

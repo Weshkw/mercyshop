@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/home.css' %}">
+    
+
+    <div class="welcome-heading">
+        <h1>Welcome to Mercy Beauty Shop  </h1>
+        
+    
+    </div>
+
+    <div class="search">
+        {% include 'search.html' %}
+    </div>
+
+    <div class="my-div">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'pettycosts'%}" class="my-link">Register expenses</a>
+      {% endif %}
+      <a href="{% url 'cart'%}" class="cartlink">VIEW CART</a>
+    </div>
+    
+  
+    
+
+</head>
+
+{% block content %}
+<body>
+ 
+    <p class="welcomeparagraph">Find the newest beauty trends in makeup, skincare, and hair care at our shop.</p>
+
+    <div class="container1">
+
+      <div class="products">
+        <h3 class="guide1">PRODUCTS</h3>
+      </div>
+
+      <div class="services">
+        <h3 class="guide2">SERVICES</h3>
+      </div>
+
+      
+      
+        
+        
+    </div>
+
+
+
+    
+    {% if results %}
+    <h1>Search Results for "{{ search_term }}"</h1>
+      {% for result in results %}
+        <div class="search-card">
+          <div class="search-image">
+            <img src="{{ result.product.home_image.url }}" alt="{{ result.product.product_name }}">
+          </div>
+          <div class="searchproduct-details">
+            <h2>{{ result.product.product_name }}</h2>
+            <p>{{ result.product.description }}</p>
+            <p>Price: ${{ result.product.selling_price }}</p>
+            <div class="searchmore-images">
+              {% for image in result.images %}
+                <img src="{{ image.more_images.url }}" alt="{{ result.product.product_name }}">
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    
+      
+    {% endif %}
+
+
+
+
+
+
+    {% if request.user.is_authenticated %}
+    {% include 'nav.html' %}
+    {%endif%}
+
+
+
+
+    
+    
+
+
+<div class="container2" >
+  <div class="home1">
+    {% for product in products %}
+    <div class="product"> 
+      <div class="product">
+        <a href="{% url 'moreinfo' product.pk %}">
+          <img src="{{ product.home_image.url }}" alt="{{ product.product_name }}" width="400">
+        </a>
+        <h4>{{ product.product_name }}</h4>
+        <h4>PRICE: {{ product.selling_price }}</h4>
+        <button id="add_to_cart_button" data-product="{{product.id}}" data-action="add">ADD TO CART</button>
+  
+        
+      </div>
+    </div>
+    {% endfor %}
+
+    {% for image in products.more_images %}
+    <img src="{{ image.url }}" alt="{{ product.product_name }}">
+    {% endfor %}
+  </div>
+
+  <div class="home2">
+    {% for video in videoss %}
+    <video controls  style="width: 400px; height: 250px; float: right;">
+       <source src="{{ video.video.url }}" type="{{ video.video.content_type }}">
+    </video>
+    {% endfor %}
+  </div>
+</div>
+  
+
+<script>
+var add_to_cart_buttons = document.querySelectorAll('#add_to_cart_button');
+
+for (var i = 0; i < add_to_cart_buttons.length; i++) {
+ add_to_cart_buttons[i].addEventListener('click', function() {
+ var productId = this.dataset.product;
+ var action = this.dataset.action;
+ 
+ // call the addToCart function here
+ addToCart(productId, action);
+ });
+}
+
+function addToCart(productId, action) {
+  var url = '/addtocart/'
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken
+    },
+    body: JSON.stringify({'productId': productId, 'action': action})
+  })
+  .then((response) => {
+    return response.json()
+  })
+
+  .then((data) => {
+    console.log('data:',data)
+  })
+}
+
+function getToken(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getToken('csrftoken');
+</script>
+
+    
+{% endblock content%}        
+
+</body>
+{% include 'footer.html' %}
+
+</html>
+
+
