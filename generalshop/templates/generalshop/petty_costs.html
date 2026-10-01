@@ -56,11 +56,11 @@
         <tfoot>
             <tr>
                 <th colspan="2">Totals (Ksh)</th>
-                <th class="numeric">{{ totals.transport|default:0 }}</th>
-                <th class="numeric">{{ totals.lunch|default:0 }}</th>
-                <th class="numeric">{{ totals.airtime|default:0 }}</th>
+                <th class="numeric">{{ totals.transport|default:0|floatformat:2 }}</th>
+                <th class="numeric">{{ totals.lunch|default:0|floatformat:2 }}</th>
+                <th class="numeric">{{ totals.airtime|default:0|floatformat:2 }}</th>
                 <th></th>
-                <th class="numeric">{{ totals.other|default:0 }}</th>
+                <th class="numeric">{{ totals.other|default:0|floatformat:2 }}</th>
             </tr>
         </tfoot>
     </table>
