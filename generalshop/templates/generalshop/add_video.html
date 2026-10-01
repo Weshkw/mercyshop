@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Add video · Mercy Beauty Shop{% endblock %}
+
+{% block content %}
+<section class="card form-card">
+    <h1>Feature a video</h1>
+    <p class="muted">The three most recent videos appear on the home page.</p>
+    <form method="post" enctype="multipart/form-data" class="stacked-form">
+        {% csrf_token %}
+        {{ form.as_div }}
+        <button type="submit" class="button button-primary button-block">Upload video</button>
+    </form>
+</section>
+{% endblock %}

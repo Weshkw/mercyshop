@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses · Mercy Beauty Shop{% endblock %}
+
+{% block content %}
+<h1>Expenses</h1>
+
+<div class="expenses-layout">
+    <section class="card">
+        <h2>Record an expense</h2>
+        <form method="post" class="stacked-form">
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button type="submit" class="button button-primary button-block">Save expense</button>
+        </form>
+    </section>
+
+    <aside class="card guidance">
+        <h2>Before you submit</h2>
+        <ul>
+            <li>Fill in every cost for the activity; enter 0 where nothing was spent.</li>
+            <li>Use “Other cost” for anything that is not transport, lunch or airtime.</li>
+            <li>If you have a concern about a cost, send a WhatsApp message to 0741 202104 with the details.</li>
+        </ul>
+    </aside>
+</div>
+
+<h2>Your expenses</h2>
+{% if entries %}
+<div class="card table-card">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Activity</th>
+                <th class="numeric">Transport</th>
+                <th class="numeric">Lunch</th>
+                <th class="numeric">Airtime</th>
+                <th>Other</th>
+                <th class="numeric">Other amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.date_created|date:"j M Y" }}</td>
+                <td>{{ entry.activity }}</td>
+                <td class="numeric">{{ entry.transport_cost }}</td>
+                <td class="numeric">{{ entry.lunch_cost }}</td>
+                <td class="numeric">{{ entry.airtime_cost }}</td>
+                <td>{% for other in entry.other_costs.all %}{{ other.others }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+                <td class="numeric">{% for other in entry.other_costs.all %}{{ other.expense }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2">Totals (Ksh)</th>
+                <th class="numeric">{{ totals.transport|default:0 }}</th>
+                <th class="numeric">{{ totals.lunch|default:0 }}</th>
+                <th class="numeric">{{ totals.airtime|default:0 }}</th>
+                <th></th>
+                <th class="numeric">{{ totals.other|default:0 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+<p class="empty">You have not recorded any expenses yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name }} · Mercy Beauty Shop{% endblock %}
+
+{% block content %}
+<article class="card product-detail">
+    <div class="gallery">
+        <img class="gallery-main" src="{{ product.home_image.url }}" alt="{{ product.product_name }}">
+        {% for image in product.moreimages.all %}
+        <img src="{{ image.more_images.url }}" alt="{{ product.product_name }}, photo {{ forloop.counter|add:1 }}" loading="lazy">
+        {% endfor %}
+    </div>
+    <div class="product-info">
+        <h1>{{ product.product_name }}</h1>
+        <p class="price">Ksh {{ product.selling_price }}</p>
+        <p>{{ product.description }}</p>
+        <p class="muted">{{ product.unit_amount }} {{ product.unit_type }} in stock</p>
+        {% include "generalshop/_add_to_cart.html" %}
+    </div>
+</article>
+{% endblock %}

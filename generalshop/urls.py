@@ -1,28 +1,13 @@
 from django.urls import path
+
 from . import views
 
-
-
-
 urlpatterns = [
-    path('',views.homepage, name='home' ),
-
-
-   # path('register/',views.register, name='register'),
-    
-    path('moreinfo/<int:pk>/',views.moreinfo, name='moreinfo'),
-    path('login/', views.login_user, name='login'),
-    path('logout/', views.logout_user, name='logout'),
-    path('searchproduct/', views.search, name='searchproduct'),
-    path('createproduct/', views.create_product, name='createproduct'),
-    path('pettycosts/', views.petty_costs, name='pettycosts'),
-    path('addvideo/', views.addvideo, name='addvideo'),
-
-    path('cart/', views.cart, name='cart'),
-    path('addtocart/', views.add_to_cart, name='addtocart'),
-    path('increasequantity/', views.increaseQuantityOfCartProduct, name='increaseQuantityOfCartProduct'),
-    path('decreasequantity/', views.decreaseQuantityOfCartProduct, name='decreaseQuantityOfCartProduct'),
-    path('deletecartitem/', views.deleteCartItem, name='deletecartitem'),
-
- 
+    path("", views.home, name="home"),
+    path("products/<int:pk>/", views.product_detail, name="product-detail"),
+    path("products/new/", views.create_product, name="create-product"),
+    path("videos/new/", views.add_video, name="add-video"),
+    path("cart/", views.cart, name="cart"),
+    path("cart/update/", views.update_cart, name="update-cart"),
+    path("petty-costs/", views.petty_costs, name="petty-costs"),
 ]

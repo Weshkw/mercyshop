@@ -1,0 +1,58 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}Mercy Beauty Shop{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap">
+    <link rel="stylesheet" href="{% static 'styles/app.css' %}">
+    <script src="{% static 'scripts/cart.js' %}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="brand" href="{% url 'home' %}">Mercy Beauty Shop</a>
+            <form class="search" method="get" action="{% url 'home' %}" role="search">
+                <input type="search" name="q" value="{{ search_term|default:'' }}" placeholder="Search products" aria-label="Search products">
+            </form>
+            <nav class="site-nav">
+                {% if perms.generalshop.add_inventoryproducts %}
+                <a href="{% url 'create-product' %}">Add product</a>
+                {% endif %}
+                {% if perms.generalshop.add_featuredvideo %}
+                <a href="{% url 'add-video' %}">Add video</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'petty-costs' %}">Expenses</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">Log out</button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}">Staff login</a>
+                {% endif %}
+                <a class="cart-link" href="{% url 'cart' %}">
+                    Cart <span class="badge" data-cart-count>{{ cart_count }}</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="message message-{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">&copy; {% now "Y" %} Mercy Beauty Shop</footer>
+</body>
+</html>
